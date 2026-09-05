@@ -1,10 +1,6 @@
-import { execFile } from "node:child_process";
-import { access, mkdir, readdir, stat } from "node:fs/promises";
-import { constants } from "node:fs";
+import { mkdir, readdir, stat } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
-import { promisify } from "node:util";
-
-const run = promisify(execFile);
+import { getFfmpeg } from "./ffmpeg.mjs";
 
 // Proxies exist so the footage can be reviewed and edited remotely without
 // moving gigabytes around. They are deliberately tiny: the final render still
@@ -16,31 +12,6 @@ const VIDEO_EXTENSIONS = [".mov", ".mp4", ".m4v", ".webm"];
 
 const publicDir = join(process.cwd(), "public");
 const proxyDir = join(publicDir, "proxies");
-
-// Remotion ships platform-specific ffmpeg binaries; pick whichever one this
-// machine actually installed rather than assuming a platform.
-const findFfmpeg = async () => {
-  const compositorRoot = join(process.cwd(), "node_modules", "@remotion");
-  const candidates = (await readdir(compositorRoot)).filter((name) =>
-    name.startsWith("compositor-"),
-  );
-
-  for (const candidate of candidates) {
-    const binary = join(compositorRoot, candidate, "ffmpeg");
-    try {
-      await access(binary, constants.X_OK);
-      await run(binary, ["-version"]);
-      return binary;
-    } catch {
-      continue;
-    }
-  }
-
-  throw new Error(
-    "Could not find a working ffmpeg in node_modules/@remotion/compositor-*. " +
-      "Run npm install first.",
-  );
-};
 
 const collectVideos = async (dir, prefix = "") => {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -62,7 +33,7 @@ const collectVideos = async (dir, prefix = "") => {
 };
 
 const main = async () => {
-  const ffmpeg = await findFfmpeg();
+  const ffmpeg = await getFfmpeg();
   const sources = (await collectVideos(publicDir)).sort((a, b) =>
     a.localeCompare(b, undefined, { numeric: true }),
   );
@@ -81,7 +52,7 @@ const main = async () => {
     const out = join(proxyDir, src.replace(/\.[^.]+$/, ".mp4"));
     await mkdir(dirname(out), { recursive: true });
 
-    await run(ffmpeg, [
+    await ffmpeg.run([
       "-y",
       "-i",
       join(publicDir, src),

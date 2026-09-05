@@ -1,16 +1,12 @@
-import { execFile } from "node:child_process";
-import { access, mkdir, readdir, writeFile } from "node:fs/promises";
-import { constants } from "node:fs";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { join, parse } from "node:path";
-import { promisify } from "node:util";
 import {
   downloadWhisperModel,
   installWhisperCpp,
   toCaptions,
   transcribe,
 } from "@remotion/install-whisper-cpp";
-
-const run = promisify(execFile);
+import { getFfmpeg } from "./ffmpeg.mjs";
 
 // Multilingual model — the `.en` variants cannot read Spanish at all.
 // `medium` is the accuracy/size balance that handles accents and gym
@@ -27,24 +23,8 @@ const captionsDir = join(publicDir, "captions");
 const whisperDir = join(process.cwd(), "whisper.cpp");
 const tmpDir = join(process.cwd(), "node_modules", ".cache", "transcribe");
 
-const findFfmpeg = async () => {
-  const compositorRoot = join(process.cwd(), "node_modules", "@remotion");
-  for (const name of await readdir(compositorRoot)) {
-    if (!name.startsWith("compositor-")) continue;
-    const binary = join(compositorRoot, name, "ffmpeg");
-    try {
-      await access(binary, constants.X_OK);
-      await run(binary, ["-version"]);
-      return binary;
-    } catch {
-      continue;
-    }
-  }
-  throw new Error("No ffmpeg found in node_modules/@remotion/compositor-*.");
-};
-
 const main = async () => {
-  const ffmpeg = await findFfmpeg();
+  const ffmpeg = await getFfmpeg();
 
   let entries;
   try {
@@ -79,7 +59,7 @@ const main = async () => {
 
     // whisper.cpp only accepts 16kHz mono wav.
     const wav = join(tmpDir, `${name}.wav`);
-    await run(ffmpeg, [
+    await ffmpeg.run([
       "-y",
       "-i",
       join(sourceDir, clip),
