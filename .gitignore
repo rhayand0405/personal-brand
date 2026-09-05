@@ -5,3 +5,12 @@ dist
 
 # Ignore the output video from Git but not videos you import into src/.
 out
+
+# Source footage stays local. Pushing raw clips would bloat the repo and
+# GitHub rejects anything over 100MB anyway.
+public/**/*.mov
+public/**/*.MOV
+public/**/*.mp4
+public/**/*.MP4
+public/**/*.m4v
+public/**/*.webm
