@@ -7,10 +7,13 @@
   "private": true,
   "dependencies": {
     "@remotion/cli": "4.0.520",
+    "@remotion/media": "4.0.520",
+    "@remotion/media-parser": "4.0.520",
+    "@remotion/tailwind-v4": "4.0.520",
+    "@remotion/transitions": "4.0.520",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "4.0.520",
-    "@remotion/tailwind-v4": "4.0.520",
     "tailwindcss": "4.0.0"
   },
   "devDependencies": {
@@ -23,6 +26,7 @@
   },
   "scripts": {
     "dev": "remotion studio",
+    "scan": "node scripts/scan-clips.mjs",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc"
