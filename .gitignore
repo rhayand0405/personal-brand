@@ -14,3 +14,7 @@ public/**/*.mp4
 public/**/*.MP4
 public/**/*.m4v
 public/**/*.webm
+
+# Proxies are the exception: small enough to share, and how the edit gets
+# reviewed remotely. The final render still uses the originals.
+!public/proxies/**

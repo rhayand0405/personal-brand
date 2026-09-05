@@ -5,7 +5,14 @@ import { ALL_FORMATS, FilePathSource, Input } from "mediabunny";
 const FPS = 30;
 const WIDTH = 1080;
 const HEIGHT = 1920;
-const MAX_CLIP_SECONDS = 2.5;
+
+// --- Pacing. Tune these, rerun `npm run scan`. ---
+// Reels live or die on completion rate, so the default is short and fast:
+// a hook clip with room to land, then quick cuts. Raise CLIP_SECONDS for a
+// calmer edit; raise MAX_CLIPS for a longer one.
+const HOOK_SECONDS = 1.6;
+const CLIP_SECONDS = 1.0;
+const MAX_CLIPS = 12;
 
 const VIDEO_EXTENSIONS = [".mov", ".mp4", ".m4v", ".webm"];
 
@@ -147,23 +154,33 @@ const main = async () => {
     process.exit(1);
   }
 
-  const probed = await Promise.all(footage.map(probe));
+  const probedAll = await Promise.all(footage.map(probe));
+  const probed = probedAll.slice(0, MAX_CLIPS);
 
-  const clips = probed.map((clip) => ({
-    ...clip,
-    trimBefore: 0,
-    durationInFrames: Math.max(
-      1,
-      Math.round(Math.min(clip.duration, MAX_CLIP_SECONDS) * FPS),
-    ),
-  }));
+  const clips = probed.map((clip, index) => {
+    const target = index === 0 ? HOOK_SECONDS : CLIP_SECONDS;
+    return {
+      ...clip,
+      trimBefore: 0,
+      durationInFrames: Math.max(
+        1,
+        Math.round(Math.min(clip.duration, target) * FPS),
+      ),
+    };
+  });
 
   const probedReferences = await Promise.all(references.map(probe));
 
   await writeFile(reelFile, buildReel(clips));
   await writeFile(clipsFile, buildClipsManifest(clips, probedReferences));
 
-  console.log(`Found ${clips.length} clips\n`);
+  console.log(
+    `Found ${probedAll.length} clips` +
+      (probedAll.length > clips.length
+        ? `, using the first ${clips.length} (MAX_CLIPS in scripts/scan-clips.mjs)`
+        : "") +
+      `\n`,
+  );
   for (const clip of clips) {
     const orientation =
       clip.width && clip.height

@@ -27,6 +27,7 @@
   "scripts": {
     "dev": "remotion studio",
     "scan": "node scripts/scan-clips.mjs",
+    "proxies": "node scripts/make-proxies.mjs",
     "thumbs": "remotion still ContactSheet out/contact-sheet.png",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
