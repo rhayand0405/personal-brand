@@ -1,0 +1,40 @@
+{
+  "name": "personal-brand-video",
+  "version": "1.0.0",
+  "description": "Remotion pipeline for short-form vertical videos",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts ShortVideo out/final.mp4",
+    "thumbnail": "remotion still src/index.ts ShortVideo out/thumbnail.png",
+    "typecheck": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhayand0405/personal-brand.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rhayand0405/personal-brand/issues"
+  },
+  "homepage": "https://github.com/rhayand0405/personal-brand#readme",
+  "dependencies": {
+    "@remotion/cli": "^4.0.521",
+    "@remotion/google-fonts": "^4.0.521",
+    "@remotion/media-utils": "^4.0.521",
+    "@remotion/transitions": "^4.0.521",
+    "@remotion/zod-types": "^4.0.521",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.521",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "typescript": "^7.0.2"
+  },
+  "private": true
+}
