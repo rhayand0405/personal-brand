@@ -30,7 +30,8 @@
     "thumbs": "remotion still ContactSheet out/contact-sheet.png",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
-    "lint": "eslint src && tsc"
+    "lint": "eslint src && tsc",
+    "refstrip": "remotion still ReferenceStrip out/reference-strip.png"
   },
   "sideEffects": [
     "*.css"

@@ -8,3 +8,7 @@ export type Clip = {
 };
 
 export const clips: Clip[] = [];
+
+// Style references — sampled by the ReferenceStrip composition, never edited
+// into the reel.
+export const references: Clip[] = [];
